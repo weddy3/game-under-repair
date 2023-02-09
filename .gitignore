@@ -1,5 +1,5 @@
 # Environments
-venv
+env
 
 # Django Stuff
 *.log
