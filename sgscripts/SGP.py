@@ -11,4 +11,10 @@ lookup_pro2 = dict(zip(rounded_putting_df.Distance, rounded_putting_df.AvgPuttsP
 lookup_scratch = dict(zip(rounded_putting_df.Distance, rounded_putting_df.AvgPuttsScratchExt))
 lookup_90s = dict(zip(rounded_putting_df.Distance, rounded_putting_df.AvgPutts90Ext))
 
-# SGP is tourAverageStrokesToHoleByDistancex - howManyStrokesYouTookFromDistancex
+# Sample putting round from book, first position is number of putts, second is distance of first putt
+tigers_round = [[1,4],[1,3],[2,3],[1,3],[1,1],[1,6],[2,22],[2,45],[2,6],[1,12],[2,4],[2,42],[2,15],[1,6],[1,5],[1,4],[2,13],[2,13]]
+
+# calculate sg for round related list
+sg = sum([lookup_pro2[hole[1]] - hole[0] for hole in tigers_round])
+
+print(round(sg, 2))
