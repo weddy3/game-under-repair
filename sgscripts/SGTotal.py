@@ -1,5 +1,4 @@
 import pandas as pd
-from pprint import pprint
 
 nonputting_df = pd.read_csv('touraverages/NonPutting.csv')
 putting_df = pd.read_csv('touraverages/Putting.csv')
@@ -19,24 +18,25 @@ lookup_pro2 = dict(zip(rounded_putting_df.Distance, rounded_putting_df.AvgPuttsP
 lookup_scratch = dict(zip(rounded_putting_df.Distance, rounded_putting_df.AvgPuttsScratchExt))
 lookup_90s = dict(zip(rounded_putting_df.Distance, rounded_putting_df.AvgPutts90Ext))
 
-# This represents a single hole of shots, the 4 tuples in order represent each SG category
-# from left to right, Off the Tee, Approach, Around the Green, Putting
+# each hole is represented by a tuple of shots
+# (shot number, lie type, distance remaining (yards, excpet for putting))
 # 'T' = Tee shot
-# 'F' = Fairway, 'R' = Rough, 'S' = Sand, 'W' = Recovery
+# 'F' = Fairway, 'R' = Rough, 'S' = Sand, 'X' = Recovery
 # 'P' = Putting
 round_dict = {
     '1': [(1, 'T', 452), (2, 'F', 164), (3, 'P', 24)],
     '2': [(1, 'F', 132), (2, 'R', 60), (3, 'S', 15), (4, 'P', 32), (5, 'P', 4)]
 }
 
-sg_OTT = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
-sg_approach = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
-sg_short = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
-sg_putting = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
+sg_OTT = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
+sg_approach = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
+sg_short = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
+sg_putting = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
 
 for hole in round_dict:
     for i in range(len(round_dict[hole])):
         # TODO account for penalty shots, hole outs, using only first putt, degreening
+        # TODO assess if top match block is necessary/ optimal?
 
         next_shot_lie = round_dict[hole][i+1][1] if i+1 < len(round_dict[hole]) else 0
         next_shot_strokes_to_hole = 0
