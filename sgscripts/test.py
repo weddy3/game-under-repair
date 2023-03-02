@@ -10,3 +10,8 @@ def test_get_expetced_strokes_tee():
     
 def test_get_expetced_strokes_rough():
     assert get_expected_strokes('R', 123) == 3.12
+
+# test for remaining lies
+
+# test for output of strokes_gained, ie correct SG in each list
+# test all edge cases here

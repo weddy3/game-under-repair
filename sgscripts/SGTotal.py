@@ -1,4 +1,5 @@
 import pandas as pd
+from collections import Counter
 
 nonputting_df = pd.read_csv('/Users/wil/Code/golf/touraverages/NonPutting.csv')
 putting_df = pd.read_csv('/Users/wil/Code/golf/touraverages/Putting.csv')
@@ -18,84 +19,82 @@ lookup_pro2 = dict(zip(rounded_putting_df.Distance, rounded_putting_df.AvgPuttsP
 lookup_scratch = dict(zip(rounded_putting_df.Distance, rounded_putting_df.AvgPuttsScratchExt))
 lookup_90s = dict(zip(rounded_putting_df.Distance, rounded_putting_df.AvgPutts90Ext))
 
-# TODO break down into smaller more testable functions
 
 def strokes_gained(round_dict: dict) -> list:
-    sg_OTT = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
-    sg_approach = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
-    sg_short = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
-    sg_putting = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
+    sg_OTT = [[] for x in range(18)]
+    sg_approach = [[] for x in range(18)]
+    sg_short = [[] for x in range(18)]
+    sg_putting = [[] for x in range(18)]
 
     # get expected number of strokes for each shot sublist
     for hole in round_dict.values():
         [shot.append(get_expected_strokes(shot[1], shot[2])) for shot in hole]
 
-    #print(round_dict)
-
+    # add strokes gained for each category to correct list
     for hole in round_dict:
+        number_of_putts = sum(x.count('P') for x in round_dict[hole])
         for index, shot in enumerate(round_dict[hole]):
             current_shot_lie = shot[1]
             current_shot_distance = shot[2]
+            current_expected_strokes = shot[3]
 
             # TODO account for penalty shots, hole outs, using only first putt, degreening (how to calculate SG of a putt that degreens), <100 yards on tee shot, which SG category
             # this doesnt account for degreening, this also skews for second putts, not sure if we want to ignore all putts after first
 
+            # not letting one putt holes through, fix
             if (index < len(round_dict[hole]) - 1):
-                next_strokes_to_hole = round_dict[hole][index+1][3]
-                match current_shot_lie:
-                    case 'T':
-                        # maybe look up why this decimal is getting thrown off and fix earlier?
-                        sg_OTT[int(hole)-1].append(round(shot[3] - next_strokes_to_hole - 1, 2))
-                    case 'F':
-                        # need to check distance to determine SG category
-                        if current_shot_distance > 99:
-                            sg_approach[int(hole)-1].append(round(shot[3] - next_strokes_to_hole - 1, 2))
-                        else:
-                            sg_short[int(hole)-1].append(round(shot[3] - next_strokes_to_hole - 1, 2))
-                    case 'R':
-                        if current_shot_distance > 99:
-                            sg_approach[int(hole)-1].append(round(shot[3] - next_strokes_to_hole - 1, 2))
-                        else:
-                            sg_short[int(hole)-1].append(round(shot[3] - next_strokes_to_hole - 1, 2))
-                    case 'S':
-                        if current_shot_distance > 99:
-                            sg_approach[int(hole)-1].append(round(shot[3] - next_strokes_to_hole - 1, 2))
-                        else:
-                            sg_short[int(hole)-1].append(round(shot[3] - next_strokes_to_hole - 1, 2))
-                    case 'X':
-                        if current_shot_distance > 99:
-                            sg_approach[int(hole)-1].append(round(shot[3] - next_strokes_to_hole - 1, 2))
-                        else:
-                            sg_short[int(hole)-1].append(round(shot[3] - next_strokes_to_hole - 1, 2))
-                    case 'P':
-                        pass
-                        #sg_putting[int(hole)-1].append(round(shot[3] - next(shot[3]), 2))
+                next_expected_strokes = round_dict[hole][index+1][3]
+            else:
+                # I think this accounts for hole outs, please test
+                next_expected_strokes = 0
 
+            if current_shot_distance < 100 and current_shot_lie != 'P':
+                sg_short[int(hole)-1].append(get_sg_nonputting(current_expected_strokes, next_expected_strokes))
+            elif current_shot_distance >= 100 and current_shot_lie not in ['T', 'P']:
+                sg_approach[int(hole)-1].append(get_sg_nonputting(current_expected_strokes, next_expected_strokes))
+            elif current_shot_distance >= 100 and current_shot_lie == 'T':
+                sg_OTT[int(hole)-1].append(get_sg_nonputting(current_expected_strokes, next_expected_strokes))
+            else:
+                # use only first putt, add test
+                sg_putting[int(hole)-1].append(get_sg_putting(current_expected_strokes, number_of_putts))
+                            
+
+    # combine into pandas df and return that? Yes
     print(sg_OTT)
     print(sg_approach)
     print(sg_short)
-    # print(sg_putting)
+    print(sg_putting)
 
     # # sg_total calculations here, by hole or just by category then total?   
 
 
-def get_expected_strokes(next_shot_lie: str, next_shot_distance: int) -> float:
+def get_sg_putting(current_expected_strokes: float, number_of_putts: float) -> float:
+    """ Returns your SG for an individual shot for off the tee or approach"""
+    return round(current_expected_strokes - number_of_putts, 2)
+
+
+def get_sg_nonputting(current_expected_strokes: float, next_expected_strokes: float) -> float:
+    """ Returns your SG for an individual shot for off the tee or approach"""
+    return round(current_expected_strokes - next_expected_strokes - 1, 2)
+
+
+def get_expected_strokes(shot_lie: str, shot_distance: int) -> float:
     """ Depending on the lie type, use the correct lookup dictionary to get the expected strokes to hole """
 
     strokes_to_hole = 0.0
-    match next_shot_lie:
+    match shot_lie:
         case 'T':
-            strokes_to_hole = lookup_tee[next_shot_distance]
+            strokes_to_hole = lookup_tee[shot_distance]
         case 'F':
-            strokes_to_hole = lookup_fairway[next_shot_distance]
+            strokes_to_hole = lookup_fairway[shot_distance]
         case 'R':
-            strokes_to_hole = lookup_rough[next_shot_distance]
+            strokes_to_hole = lookup_rough[shot_distance]
         case 'S':
-            strokes_to_hole = lookup_sand[next_shot_distance]
+            strokes_to_hole = lookup_sand[shot_distance]
         case 'X':
-            strokes_to_hole = lookup_recovery[next_shot_distance]
+            strokes_to_hole = lookup_recovery[shot_distance]
         case 'P':
-            strokes_to_hole = lookup_pro2[next_shot_distance]
+            strokes_to_hole = lookup_pro2[shot_distance]
     
     return strokes_to_hole
 
