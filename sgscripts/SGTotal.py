@@ -1,5 +1,6 @@
 import pandas as pd
 from collections import Counter
+from pprint import pprint
 
 nonputting_df = pd.read_csv('/Users/wil/Code/golf/touraverages/NonPutting.csv')
 putting_df = pd.read_csv('/Users/wil/Code/golf/touraverages/Putting.csv')
@@ -20,11 +21,8 @@ lookup_scratch = dict(zip(rounded_putting_df.Distance, rounded_putting_df.AvgPut
 lookup_90s = dict(zip(rounded_putting_df.Distance, rounded_putting_df.AvgPutts90Ext))
 
 
-def strokes_gained(round_dict: dict) -> list:
-    sg_OTT = [[] for x in range(18)]
-    sg_approach = [[] for x in range(18)]
-    sg_short = [[] for x in range(18)]
-    sg_putting = [[] for x in range(18)]
+def strokes_gained(round_dict: dict) -> pd.DataFrame:
+    sg_df = make_sg_df()
 
     # get expected number of strokes for each shot sublist
     for hole in round_dict.values():
@@ -38,8 +36,7 @@ def strokes_gained(round_dict: dict) -> list:
             current_shot_distance = shot[2]
             current_expected_strokes = shot[3]
 
-            # TODO account for penalty shots, hole outs, using only first putt, degreening (how to calculate SG of a putt that degreens), <100 yards on tee shot, which SG category
-            # this doesnt account for degreening, this also skews for second putts, not sure if we want to ignore all putts after first
+            # TODO account for penalty shots, hole outs, using only first putt, degreening (how to calculate SG of a putt that degreens)
 
             # not letting one putt holes through, fix
             if (index < len(round_dict[hole]) - 1):
@@ -49,24 +46,17 @@ def strokes_gained(round_dict: dict) -> list:
                 next_expected_strokes = 0
 
             if current_shot_distance < 100 and current_shot_lie != 'P':
-                sg_short[int(hole)-1].append(get_sg_nonputting(current_expected_strokes, next_expected_strokes))
+                sg_df.at[(int(hole)-1), 'SG_ATG'].append(get_sg_nonputting(current_expected_strokes, next_expected_strokes))
             elif current_shot_distance >= 100 and current_shot_lie not in ['T', 'P']:
-                sg_approach[int(hole)-1].append(get_sg_nonputting(current_expected_strokes, next_expected_strokes))
+                sg_df.at[int(hole)-1, 'SG_APP'].append(get_sg_nonputting(current_expected_strokes, next_expected_strokes))
             elif current_shot_distance >= 100 and current_shot_lie == 'T':
-                sg_OTT[int(hole)-1].append(get_sg_nonputting(current_expected_strokes, next_expected_strokes))
+                sg_df.at[int(hole)-1, 'SG_OTT'].append(get_sg_nonputting(current_expected_strokes, next_expected_strokes))
             else:
                 # use only first putt, add test
-                sg_putting[int(hole)-1].append(get_sg_putting(current_expected_strokes, number_of_putts))
+                sg_df.at[int(hole)-1, 'SG_PUT'].append(get_sg_putting(current_expected_strokes, number_of_putts))
                             
 
-    # combine into pandas df and return that? Yes
-    print(sg_OTT)
-    print(sg_approach)
-    print(sg_short)
-    print(sg_putting)
-
-    # # sg_total calculations here, by hole or just by category then total?   
-
+    pprint(sg_df)
 
 def get_sg_putting(current_expected_strokes: float, number_of_putts: float) -> float:
     """ Returns your SG for an individual shot for off the tee or approach"""
@@ -97,6 +87,18 @@ def get_expected_strokes(shot_lie: str, shot_distance: int) -> float:
             strokes_to_hole = lookup_pro2[shot_distance]
     
     return strokes_to_hole
+
+
+def make_sg_df():
+    """Generate an empty pandas df to hold converted sg info"""
+
+    data = {
+        'SG_OTT': [[] for x in range(18)],
+        'SG_APP': [[] for x in range(18)],
+        'SG_ATG': [[] for x in range(18)],
+        'SG_PUT': [[] for x in range(18)]
+    }
+    return pd.DataFrame(data=data)
 
 
 def main():
