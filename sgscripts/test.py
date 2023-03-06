@@ -1,4 +1,4 @@
-from SGTotal import strokes_gained, get_expected_strokes, get_sg_nonputting, get_sg_putting
+from SGTotal import *
 import datatest as dt
 
 one_putt_hole = {
@@ -21,7 +21,8 @@ penalty_shot_hole = {
     '1': [[1, 'T', 452], [2, 'NA'], [3, 'T', 452], [4, 'F', 150] , [5, 'P', 7],]
 }
 
-
+# TODO test for hole outs, degreening, penalty shots, other edge cases, multiple hole variations of data
+# TODO look up more pytest conventions to see how to improve this file
 def test_get_expected_strokes_tee():
     assert get_expected_strokes('T', 452) == 4.23
     
@@ -51,6 +52,7 @@ def test_get_sg_nonputting():
     assert get_sg_nonputting(3.9, 2.3) == .6
     assert get_sg_nonputting(4.0, 3.0) == 0
 
-
-# test for output of strokes_gained, ie correct SG in each list
-# test all edge cases here
+def test_add_expected_strokes():
+    assert add_expected_strokes(one_putt_hole) == {
+        '1': [[1, 'T', 452, 4.23], [2, 'F', 164, 3.03], [3, 'P', 24, 1.88]]
+}

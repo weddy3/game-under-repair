@@ -24,9 +24,7 @@ lookup_90s = dict(zip(rounded_putting_df.Distance, rounded_putting_df.AvgPutts90
 def strokes_gained(round_dict: dict) -> pd.DataFrame:
     sg_df = make_sg_df()
 
-    # get expected number of strokes for each shot sublist
-    for hole in round_dict.values():
-        [shot.append(get_expected_strokes(shot[1], shot[2])) for shot in hole]
+    round = add_expected_strokes(round_dict)
 
     # add strokes gained for each category to correct list
     for hole in round_dict:
@@ -36,14 +34,15 @@ def strokes_gained(round_dict: dict) -> pd.DataFrame:
             current_shot_distance = shot[2]
             current_expected_strokes = shot[3]
 
-            # TODO account for penalty shots, hole outs, using only first putt, degreening (how to calculate SG of a putt that degreens)
-
-            # not letting one putt holes through, fix
+            # TODO account for penalty shots, using only first putt, degreening (how to calculate SG of a putt that degreens)
             if (index < len(round_dict[hole]) - 1):
                 next_expected_strokes = round_dict[hole][index+1][3]
             else:
                 # I think this accounts for hole outs, please test
                 next_expected_strokes = 0
+
+            # TODO create function for this logic so we can test correct categories
+            # then use a match or something to df.at.append? Can test for penalty shots in there? Figure how to handle
 
             if current_shot_distance < 100 and current_shot_lie != 'P':
                 sg_df.at[(int(hole)-1), 'SG_ATG'].append(get_sg_nonputting(current_expected_strokes, next_expected_strokes))
@@ -52,11 +51,21 @@ def strokes_gained(round_dict: dict) -> pd.DataFrame:
             elif current_shot_distance >= 100 and current_shot_lie == 'T':
                 sg_df.at[int(hole)-1, 'SG_OTT'].append(get_sg_nonputting(current_expected_strokes, next_expected_strokes))
             else:
-                # use only first putt, add test
                 sg_df.at[int(hole)-1, 'SG_PUT'].append(get_sg_putting(current_expected_strokes, number_of_putts))
+                # break if first 'P'? how do we calculate sg for degreening? Just how many stokes after first putt?
+                break
                             
+    return sg_df
 
-    pprint(sg_df)
+
+def add_expected_strokes(round: dict) -> dict:
+    """Appends expected number of strokes to hole out for PGA player to the round data dict"""
+    # TODO figure out why this works lol
+    for hole in round.values():
+        [shot.append(get_expected_strokes(shot[1], shot[2])) for shot in hole]
+
+    return round
+
 
 def get_sg_putting(current_expected_strokes: float, number_of_putts: float) -> float:
     """ Returns your SG for an individual shot for off the tee or approach"""
@@ -109,10 +118,12 @@ def main():
     # 'P' = Putting
     round_dict = {
         '1': [[1, 'T', 452], [2, 'F', 164], [3, 'P', 24]],
-        '2': [[1, 'F', 132], [2, 'R', 60], [3, 'S', 15], [4, 'P', 32], [5, 'P', 4]]
+        '2': [[1, 'F', 132], [2, 'R', 60], [3, 'S', 15], [4, 'P', 32], [5, 'P', 4]],
+        '3': [[1, 'T', 452], [2, 'F', 164]]
     }
 
-    strokes_gained(round_dict)
+    sg_df = strokes_gained(round_dict)
+    pprint(sg_df)
 
 if __name__ == '__main__':
     main()
