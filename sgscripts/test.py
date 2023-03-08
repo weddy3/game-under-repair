@@ -22,22 +22,17 @@ penalty_shot_hole = {
 }
 
 # TODO test for hole outs, degreening, penalty shots, other edge cases, multiple hole variations of data
-# TODO look up more pytest conventions to see how to improve this file
 def test_get_expected_strokes_tee():
     assert get_expected_strokes('T', 452) == 4.23
-    
 
 def test_get_expected_strokes_rough():
     assert get_expected_strokes('R', 123) == 3.12
 
-
 def test_get_expected_strokes_fairway():
     assert get_expected_strokes('F', 150) == 2.98
 
-
 def test_get_expected_strokes_sand():
     assert get_expected_strokes('S', 85) == 3.12
-
 
 def test_get_expected_strokes_recovery():
     assert get_expected_strokes('X', 200) == 3.87
@@ -56,3 +51,8 @@ def test_add_expected_strokes():
     assert add_expected_strokes(one_putt_hole) == {
         '1': [[1, 'T', 452, 4.23], [2, 'F', 164, 3.03], [3, 'P', 24, 1.88]]
 }
+
+def test_get_category_OTT():
+    get_category(500, 'T') == 'OTT'
+
+    # add mmore categories
