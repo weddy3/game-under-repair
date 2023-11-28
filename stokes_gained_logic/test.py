@@ -1,4 +1,4 @@
-from SGTotal import *
+from stokes_gained_logic.SGTotal import *
 import datatest as dt
 
 one_putt_hole = {

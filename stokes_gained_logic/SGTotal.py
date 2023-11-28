@@ -1,6 +1,7 @@
 import pandas as pd
 from collections import Counter
 from pprint import pprint
+from shot import Shot
 
 nonputting_df = pd.read_csv('/Users/wil/Code/golf/touraverages/NonPutting.csv')
 putting_df = pd.read_csv('/Users/wil/Code/golf/touraverages/Putting.csv')
@@ -23,12 +24,18 @@ lookup_90s = dict(zip(rounded_putting_df.Distance, rounded_putting_df.AvgPutts90
 
 def strokes_gained(round_dict: dict) -> pd.DataFrame:
     """
-    INPUT: round_dict -> Dictionary containing shot information from a given round [shot number, lie type, distance to hole]
+    INPUT: round_dict -> Dictionary containing shot classes
     OUTPUT: sg_df -> dataframe which contains SG shot value for each of your shots for every hole
+    TODO account for penalty strokes
     """
     sg_df = make_sg_df()
 
     add_expected_strokes(round_dict)
+
+    # need to figure out what can be put in shot class, how we still want to look forward to next shot
+    # do this inside of a round class, or do we simply have a list of shots? <-- probs this for now
+
+    # TODO need to remove mopst oif the index, figuring out how to add in expected shots nicely
 
     for hole in round_dict:
         number_of_putts = 0
@@ -36,17 +43,16 @@ def strokes_gained(round_dict: dict) -> pd.DataFrame:
             # gets index of first P, gets remaining length for nuumber of putts, my solution to degreening
             if 'P' in shot:
                 number_of_putts = len(round_dict[hole][index:])
-            current_shot_lie = shot[1]
-            current_shot_distance = shot[2]
+            current_shot_lie = shot.lie
+            current_shot_distance = shot.distnace_remaining
             current_expected_strokes = shot[3]
 
-            # TODO account for penalty shots
             if (index < len(round_dict[hole]) - 1):
                 next_expected_strokes = round_dict[hole][index+1][3]
             else:
                 next_expected_strokes = 0
 
-            category = get_category(current_shot_distance, current_shot_lie)
+            category = shot.get_category()
 
             match category:
                 case 'ATG':
@@ -61,21 +67,6 @@ def strokes_gained(round_dict: dict) -> pd.DataFrame:
                     break
                             
     return sg_df
-
-
-def get_category(current_shot_distance: int, current_shot_lie: str) -> str:
-    """Returns the correct SG category to add shot info to"""
-    if current_shot_distance <= 99 and current_shot_lie != 'P':
-        return 'ATG'
-    elif current_shot_distance >= 100 and current_shot_lie not in ['T', 'P']:
-        return 'APP'
-    elif current_shot_distance >= 100 and current_shot_lie == 'T':
-        return 'OTT'
-    elif current_shot_lie == 'P':
-        return 'PUT'
-    else:
-        return 'BAD'
-
 
 def add_expected_strokes(round: dict) -> dict:
     """Appends expected number of strokes to hole out for PGA player to the round data dict"""
@@ -129,15 +120,15 @@ def make_sg_df():
 
 
 def main():
-    # each hole is represented by a tuple of shots
+    # each hole is represented by list of shot classes
     # (shot number, lie type, distance remaining (yards, excpet for putting))
     # 'T' = Tee shot
     # 'F' = Fairway, 'R' = Rough, 'S' = Sand, 'X' = Recovery
     # 'P' = Putting
     round_dict = {
-        '1': [[1, 'T', 452], [2, 'F', 164], [3, 'P', 24]],
-        '2': [[1, 'F', 132], [2, 'R', 60], [3, 'S', 15], [4, 'P', 32], [5, 'P', 4]],
-        '3': [[1, 'T', 452], [2, 'F', 164]]
+        '1': [Shot(1, 'T', 400), Shot(2, 'F', 100), Shot(3, 'P', 10)],
+        '2': [Shot(1, 'T', 400), Shot(2, 'F', 100), Shot(3, 'P', 10)],
+        '3': [Shot(1, 'T', 400), Shot(2, 'F', 100), Shot(3, 'P', 10)]
     }
 
     sg_df = strokes_gained(round_dict)
