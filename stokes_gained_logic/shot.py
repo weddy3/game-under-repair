@@ -5,6 +5,7 @@ class Shot:
         self.lie = lie
         self.distance_remaining = distance_remaining
         self.penalty = penalty
+        self.expected_strokes_to_hole_out = 0.0
 
 
     def __str__(self):
@@ -24,3 +25,8 @@ class Shot:
             return 'PUT'
         else:
             return 'BAD'
+
+
+    def set_expected_strokes_to_hole_out(self, expected_strokes: int):
+        """Sets expected_strokes_to_hole_out"""
+        self.expected_strokes_to_hole_out = expected_strokes
