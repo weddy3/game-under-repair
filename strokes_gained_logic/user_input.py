@@ -13,6 +13,7 @@ def get_user_input():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
+    # this is shots OR the path to a csv with shot info
     parser.add_argument("shots", metavar="shots", help="shot info", type=str)
 
     return parser.parse_args()
