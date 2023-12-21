@@ -1,4 +1,5 @@
 import pandas as pd
+from shot import Shot
 
 # TODO clean up this mess
 nonputting_df = pd.read_csv("/Users/wil/Code/golf/touraverages/NonPutting.csv")
@@ -73,7 +74,26 @@ def get_sg_for_shot(
 
 def convert_raw_input_to_shot(raw_user_input: str) -> dict:
     """Converts raw input data to a dict of Shots keyed by hole number"""
-    # TODO convert to dict
-    raw_shot_dict = {}
+
+    # split each hole into a string inside one list, print to see what this looks like
+    holes = raw_user_input.split(';')
+
+    # need to create an empty dict
+
+    # for each hole in holes (list above), append a Shot object keyed by hole number
+
+    # basically make the below
+    # "1:(1,'T',400),(2,'F',100);2:(1,'T',300)"  (this is raw user input)
+    # turn into
+    #     # golf_round = {
+    #     "1": [
+    #         Shot(1, "T", 400),
+    #         Shot(2, "F", 100),
+    #     ],
+    #     "2": [Shot(1, "T", 300)],
+    # }
+
+    # then return the dict and supply it as input to strokes_gained.py method
+    
 
     return dict(raw_user_input)

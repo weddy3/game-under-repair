@@ -4,6 +4,7 @@ from sg_utils import *
 
 
 # --------------------------------------------------
+# example user input for one hole
 # python user_input.py "1:(1,'T',400),(2,'F',100);2:(1,'T',300)"
 def get_user_input():
     """Get shot information from the CLI"""
