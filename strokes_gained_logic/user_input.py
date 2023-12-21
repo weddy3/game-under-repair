@@ -24,7 +24,9 @@ def get_user_input():
 def main():
     args = get_user_input()
 
-    statistical_round = strokes_gained(args.shots)
+    round_dict = convert_raw_input_to_shot(args.shots)
+
+    statistical_round = strokes_gained(round_dict)
 
     print(
         statistical_round,
