@@ -1,5 +1,6 @@
 import pandas as pd
 from shot import Shot
+from collections import defaultdict
 
 # TODO clean up this mess
 nonputting_df = pd.read_csv("/Users/wil/Code/golf/touraverages/NonPutting.csv")
@@ -73,27 +74,35 @@ def get_sg_for_shot(
 
 
 def convert_raw_input_to_shot(raw_user_input: str) -> dict:
-    """Converts raw input data to a dict of Shots keyed by hole number"""
+    """
+    Converts raw input data to a dict of Shots keyed by hole number
+    input: "1:[1,'T',400],[2,'F',100];2:[1,'T',300]"
+    output: {'1': [Shot(...), Shot(...)], '2': Shot(...)}
+    """
 
-    # split each hole into a string inside one list, print to see what this looks like
-    holes = raw_user_input.split(';')
+    # Default dict to represent eventual Shots keyed by hole number
+    round_dict = defaultdict(list)
 
-    # need to create an empty dict
+    # split each hole (hole number: shot info) into separate strings inside one list
+    split_hole_data = raw_user_input.split(';')
 
-    # for each hole in holes (list above), append a Shot object keyed by hole number
+    for hole in split_hole_data:
+        # separates hole number from shot data list for each hole
+        hole_number_and_shots = hole.split(':')
+        # grabs just hole number for eventual keying of dict
+        hole_number = hole_number_and_shots[0]
+        # transform from messy, post-split data, to a list of of string lists
+        # ['[shot_number, lie, distance_remaining_penalty]'] is the eventual goal
+        shots = hole_number_and_shots[1].split(',[')
+        fixed_shots = [shots[0]] + ['[' + x for x in shots[1:]]
+        # takes list of string lists and turns to list of lists
+        list_shots = [eval(i) for i in fixed_shots]
+        for shot in list_shots:
+            # check existence of penalty boolean
+            penalty = True if len(shot) == 4 else False
+            # create shot object based of the shot we are looking at for this hole
+            current_shot = Shot(stroke=shot[0], lie=shot[1], distance_remaining=shot[2], penalty=penalty)
+            # default dict allows use of append which creates if key doesn't exist, else appends
+            round_dict[hole_number].append(current_shot)
 
-    # basically make the below
-    # "1:(1,'T',400),(2,'F',100);2:(1,'T',300)"  (this is raw user input)
-    # turn into
-    #     # golf_round = {
-    #     "1": [
-    #         Shot(1, "T", 400),
-    #         Shot(2, "F", 100),
-    #     ],
-    #     "2": [Shot(1, "T", 300)],
-    # }
-
-    # then return the dict and supply it as input to strokes_gained.py method
-    
-
-    return dict(raw_user_input)
+    return round_dict
