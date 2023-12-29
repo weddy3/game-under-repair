@@ -1,0 +1,17 @@
+{% extends "golf_round_post/base.html" %}
+{% block content %}
+        <h1>The Home of Golf</h1>
+        <script src="" async defer></script>
+        {% for round in rounds %}
+        <article class="media content-section">
+            <div class="media-body">
+              <div class="article-metadata">
+                <a class="mr-2" href="#">{{ round.golfer }}</a>
+                <small class="text-muted">On {{ round.date_posted }}</small>
+              </div>
+              <h2><a class="article-title" href="#">Total Strokes Gained: {{ round.total_strokes_gained }}</a></h2>
+              <p class="article-content">At {{ round.course }}</p>
+            </div>
+          </article>
+        {% endfor %}
+{% endblock content %}
