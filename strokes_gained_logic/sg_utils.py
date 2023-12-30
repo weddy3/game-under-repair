@@ -1,10 +1,16 @@
 import pandas as pd
+import os
 from shot import Shot
 from collections import defaultdict
 
-# TODO clean up this mess
-nonputting_df = pd.read_csv("/Users/wil/Code/golf/touraverages/NonPutting.csv")
-putting_df = pd.read_csv("/Users/wil/Code/golf/touraverages/Putting.csv")
+# Instantiate paths
+repo_root = os.environ.get('USER_REPO_HOME')
+nonputting_csv_path = "/touraverages/NonPutting.csv"
+putting_csv_path = "/touraverages/Putting.csv"
+
+# Read in CSV's
+nonputting_df = pd.read_csv(f'{repo_root}{nonputting_csv_path}')
+putting_df = pd.read_csv(f'{repo_root}{putting_csv_path}')
 
 rounded_nonputting_df = nonputting_df.round(2)
 rounded_putting_df = putting_df.round(2)
