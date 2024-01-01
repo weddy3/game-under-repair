@@ -7,7 +7,7 @@
             <div class="media-body">
               <div class="article-metadata">
                 <a class="mr-2" href="#">{{ round.golfer }}</a>
-                <small class="text-muted">On {{ round.date_posted }}</small>
+                <small class="text-muted">On {{ round.date_posted|date:"F d, Y" }}</small>
               </div>
               <h2><a class="article-title" href="#">Total Strokes Gained: {{ round.total_strokes_gained }}</a></h2>
               <p class="article-content">At {{ round.course }}</p>

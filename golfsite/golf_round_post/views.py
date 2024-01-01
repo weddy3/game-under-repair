@@ -3,7 +3,7 @@ from .models import GolfRound
 
 def home(request):
     context = {
-        'posts': GolfRound.objects.all()
+        'rounds': GolfRound.objects.all()
     }
 
     # this render takes in a request, and 'directory within local templates dir/page to load'
