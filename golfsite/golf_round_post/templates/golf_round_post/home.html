@@ -4,6 +4,7 @@
         <script src="" async defer></script>
         {% for round in rounds %}
         <article class="media content-section">
+          <img class="rounded-circle article-img" src="{{ round.golfer.profile.image.url }}">
             <div class="media-body">
               <div class="article-metadata">
                 <a class="mr-2" href="#">{{ round.golfer }}</a>
