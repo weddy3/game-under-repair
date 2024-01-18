@@ -1,6 +1,6 @@
 {% extends "golf_round_post/base.html" %}
 {% block content %}
-        <h1>The Home of Golf</h1>
+        <h1 class="mb-3">Rounds by {{ view.kwargs.username }} ({{ page_obj.paginator.count }})</h1>
         <script src="" async defer></script>
         {% for round in rounds %}
         <article class="media content-section">

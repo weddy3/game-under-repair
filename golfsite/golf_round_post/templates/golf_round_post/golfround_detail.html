@@ -6,7 +6,7 @@
         <img class="rounded-circle article-img" src="{{ object.golfer.profile.image.url }}">
         <div class="media-body">
             <div class="article-metadata">
-                <a class="mr-2" href="#">{{ object.golfer }}</a>
+                <a class="mr-2" href="{% url 'user-rounds' object.golfer.username %}">{{ object.golfer }}</a>
                 <small class="text-muted">On {{ object.date_posted|date:"F d, Y" }}</small>
                 {% if object.golfer == user %}
                 <div>
