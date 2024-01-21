@@ -28,6 +28,7 @@ def main():
 
     statistical_round = strokes_gained(round_dict)
 
+    # TODO this output is fine for now, will eventually be a load into a database or somewhere
     print(
         statistical_round,
         statistical_round.cumulative_ott,

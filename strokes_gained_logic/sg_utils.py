@@ -84,24 +84,26 @@ def convert_raw_input_to_shot(raw_user_input: str) -> dict:
     round_dict = defaultdict(list)
 
     # split each hole (hole number: shot info) into separate strings inside one list
-    split_hole_data = raw_user_input.split(';')
+    split_hole_data = raw_user_input.split(";")
 
     for hole in split_hole_data:
         # separates hole number from shot data list for each hole
-        hole_number_and_shots = hole.split(':')
+        hole_number_and_shots = hole.split(":")
         # grabs just hole number for eventual keying of dict
         hole_number = hole_number_and_shots[0]
         # transform from messy, post-split data, to a list of of string lists
         # ['[shot_number, lie, distance_remaining_penalty]'] is the eventual goal
-        shots = hole_number_and_shots[1].split(',[')
-        fixed_shots = [shots[0]] + ['[' + x for x in shots[1:]]
+        shots = hole_number_and_shots[1].split(",[")
+        fixed_shots = [shots[0]] + ["[" + x for x in shots[1:]]
         # takes list of string lists and turns to list of lists
         list_shots = [eval(i) for i in fixed_shots]
         for shot in list_shots:
             # check existence of penalty boolean
             penalty = True if len(shot) == 4 else False
             # create shot object based of the shot we are looking at for this hole
-            current_shot = Shot(stroke=shot[0], lie=shot[1], distance_remaining=shot[2], penalty=penalty)
+            current_shot = Shot(
+                stroke=shot[0], lie=shot[1], distance_remaining=shot[2], penalty=penalty
+            )
             # default dict allows use of append which creates if key doesn't exist, else appends
             round_dict[hole_number].append(current_shot)
 
