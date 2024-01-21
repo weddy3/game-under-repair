@@ -1,0 +1,3 @@
+# Change paths in this file to your local paths
+# Run 'source environment_variables'
+export USER_REPO_HOME="/path/to/repo/root/"
