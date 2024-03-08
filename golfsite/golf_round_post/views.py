@@ -32,6 +32,7 @@ class RoundDetailView(DetailView):
 # This mixin in forces a user to be logged in prior to creating
 class RoundCreateView(LoginRequiredMixin, CreateView):
     # This will eventually allow for all necessary input in order to calculate strokes gained
+    # TODO add serialization stuff here, figure out class instantiation
     model = GolfRound
     fields = ['course', 'score']
 
