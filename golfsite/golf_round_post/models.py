@@ -3,48 +3,51 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.urls import reverse
 
-# TODO fill in all necessary params and double check logic
 
 class GolfShot(models.Model):
-    stroke_number = models.SmallIntegerField()
-    lie = models.TextField()
-    distance_remaining = models.SmallIntegerField()
-    penalty = models.BooleanField()
-    expected_strokes_to_hole_out = models.FloatField()
+    stroke_number = models.SmallIntegerField(null=True)
+    lie = models.CharField(max_length=10)
+    distance_remaining = models.SmallIntegerField(null=True)
+    penalty = models.BooleanField(null=True)
+    expected_strokes_to_hole_out = models.FloatField(null=True)
 
 
 class GolfHole(models.Model):
+    score = models.SmallIntegerField(null=True)
+    par = models.SmallIntegerField(null=True)
+    distance = models.SmallIntegerField(null=True)
+    total_strokes_gained = models.FloatField(null=True)
+    ott_strokes_gained = models.FloatField(null=True)
+    app_strokes_gained = models.FloatField(null=True)
+    atg_strokes_gained = models.FloatField(null=True)
+    put_strokes_gained = models.FloatField(null=True)
+    hole_number_in_golfers_round = models.SmallIntegerField(null=True)
     shot = models.ForeignKey(GolfShot, on_delete=models.CASCADE)
-    score = models.SmallIntegerField()
-    par = models.SmallIntegerField()
-    distance = models.SmallIntegerField()
-    total_strokes_gained = models.FloatField(default=0.0)
-    ott_strokes_gained = models.FloatField(default=0.0)
-    app_strokes_gained = models.FloatField(default=0.0)
-    atg_strokes_gained = models.FloatField(default=0.0)
-    put_strokes_gained = models.FloatField(default=0.0)
-    hole_number_in_golfers_round = models.SmallIntegerField()
+
+
+class GolfTees(models.Model):
+    name = models.CharField(max_length=50, primary_key=True)
+    distance = models.SmallIntegerField(null=True)
+    slope = models.SmallIntegerField(null=True)
+    rating = models.FloatField(null=True)
 
 
 class GolfCourse(models.Model):
-    name = models.TextField()
-    distance = models.SmallIntegerField()
-    tee = models.TextField()
-    slope = models.SmallIntegerField()
-    rating = models.FloatField()
-    city = models.TextField()
-    state = models.TextField()
+    name = models.CharField(max_length=100, primary_key=True)
+    tees = models.ForeignKey(GolfTees, on_delete=models.CASCADE)
+    city = models.CharField(max_length=15)
+    state = models.CharField(max_length=2)
 
 
 class GolfRound(models.Model):
-    course = models.OneToOneField(GolfCourse, on_delete=models.CASCADE, primary_key=True)
-    score = models.SmallIntegerField(default=100)
+    course = models.OneToOneField(GolfCourse, on_delete=models.CASCADE)
+    score = models.SmallIntegerField(null=True)
     date_posted = models.DateField(default=timezone.now)
-    total_strokes_gained = models.FloatField(default=0.0)
-    ott_strokes_gained = models.FloatField(default=0.0)
-    app_strokes_gained = models.FloatField(default=0.0)
-    atg_strokes_gained = models.FloatField(default=0.0)
-    put_strokes_gained = models.FloatField(default=0.0)
+    total_strokes_gained = models.FloatField(null=True)
+    ott_strokes_gained = models.FloatField(null=True)
+    app_strokes_gained = models.FloatField(null=True)
+    atg_strokes_gained = models.FloatField(null=True)
+    put_strokes_gained = models.FloatField(null=True)
     golfer = models.ForeignKey(User, on_delete=models.CASCADE)
     hole = models.ForeignKey(GolfHole, on_delete=models.CASCADE)
 
